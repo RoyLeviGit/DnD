@@ -11,7 +11,7 @@ class GPitput:
             "dialogue_opening": "The following is a conversation with a DnD Dungeon Master (DM). "
                                 "The DM is creative, clever, "
                                 "and never decides the actions for the players.\n\n",
-            "asker": "Players: ",
+            "asker": "Player: ",
             "responser": "DM: "
         }
         self.__history = {
@@ -20,7 +20,7 @@ class GPitput:
         }
         self.__logger = Logger(__class__.__name__)
 
-    def chat(self, ask, max_tokens=128, temperature=0.2):
+    def chat(self, ask, max_tokens=128, temperature=0.5):
         prompt = self.__generate_prompt(ask)
         completions = openai.Completion.create(
             engine="text-davinci-003",
@@ -30,7 +30,7 @@ class GPitput:
             # TODO stop=self.__setting["asker"]
         )
         response = completions.choices[0].text
-        self.__history["ask"].append(response)
+        self.__history["ask"].append(ask)
         self.__history["response"].append(response)
 
         self.__log(ask, prompt, response)
@@ -45,16 +45,15 @@ class GPitput:
 
         if len(prompt) > 4096:
             print("Reached maximum history")
-            # TODO better history management
-            self.__clear_history()
-            prompt = self.__setting["dialogue_opening"]
+            self.__shorten_history()
+            return self.__generate_prompt(ask)
 
         prompt += self.__setting["asker"] + ask + "\n" + self.__setting["responser"]
         return prompt
 
-    def __clear_history(self):
-        self.__history["ask"] = []
-        self.__history["response"] = []
+    def __shorten_history(self):
+        self.__history["ask"] = self.__history["ask"][1:]
+        self.__history["response"] = self.__history["response"][1:]
 
     def __log(self, ask, prompt, response):
         self.__logger.log(ask, "ask")
