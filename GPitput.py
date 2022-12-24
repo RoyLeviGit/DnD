@@ -11,8 +11,8 @@ class GPitput:
             "dialogue_opening": "The following is a conversation with a DnD Dungeon Master (DM). "
                                 "The DM is creative, clever, "
                                 "and never decides the actions for the players.\n\n",
-            "asker": "Players"
-            "responser" "DM"
+            "asker": "Players: ",
+            "responser": "DM: "
         }
         self.__history = {
             "ask": [],
@@ -26,7 +26,8 @@ class GPitput:
             engine="text-davinci-003",
             prompt=prompt,
             max_tokens=max_tokens,
-            temperature=temperature,
+            temperature=temperature
+            # TODO stop=self.__setting["asker"]
         )
         response = completions.choices[0].text
         self.__history["ask"].append(response)
@@ -39,8 +40,8 @@ class GPitput:
     def __generate_prompt(self, ask):
         prompt = self.__setting["dialogue_opening"]
         for hist_ask, hist_resp in zip(self.__history["ask"], self.__history["response"]):
-            prompt += self.__setting["asker"] + ": " + hist_ask + "\n"
-            prompt += self.__setting["responser"] + ": " + hist_resp + "\n"
+            prompt += self.__setting["asker"] + hist_ask + "\n"
+            prompt += self.__setting["responser"] + hist_resp + "\n"
 
         if len(prompt) > 4096:
             print("Reached maximum history")
@@ -48,7 +49,7 @@ class GPitput:
             self.__clear_history()
             prompt = self.__setting["dialogue_opening"]
 
-        prompt += self.__setting["asker"] + ": " + ask + "\n" + self.__setting["responser"] + ": "
+        prompt += self.__setting["asker"] + ask + "\n" + self.__setting["responser"]
         return prompt
 
     def __clear_history(self):
