@@ -5,7 +5,7 @@ from Logger import Logger
 
 
 class GPitput:
-    def __init__(self, setting=None, name=""):
+    def __init__(self, setting=None, name="", max_history_length=None):
         openai.api_key = os.getenv("OPENAI_API_KEY")
         self.__setting = setting if setting is not None else {
             "dialogue_opening": "The following is a conversation with a DnD Dungeon Master (DM). "
@@ -18,6 +18,7 @@ class GPitput:
             "ask": [],
             "response": []
         }
+        self.__max_history_length = max_history_length
         self.__logger = Logger(f"{__class__.__name__}{name}")
 
     def chat(self, ask, max_tokens=128, temperature=0.5):
@@ -30,9 +31,8 @@ class GPitput:
             # TODO stop=self.__setting["asker"]
         )
         response = completions.choices[0].text
-        self.__history["ask"].append(ask)
-        self.__history["response"].append(response)
 
+        self.__append_to_history(ask, response)
         self.__log(ask, prompt, response)
 
         return response
@@ -50,6 +50,12 @@ class GPitput:
 
         prompt += self.__setting["asker"] + ask + "\n" + self.__setting["responser"]
         return prompt
+
+    def __append_to_history(self, ask, response):
+        self.__history["ask"].append(ask)
+        self.__history["response"].append(response)
+        if self.__max_history_length is not None and len(self.__history["ask"]) > self.__max_history_length:
+            self.__shorten_history()
 
     def __shorten_history(self):
         self.__history["ask"] = self.__history["ask"][1:]

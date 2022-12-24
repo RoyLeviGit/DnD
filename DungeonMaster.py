@@ -11,7 +11,9 @@ class DungeonMaster:
             "asker": "Player: ",
             "responser": "DM: "
         }
-        self.g_pitput_scene = GPitput(setting=g_pitput_scene_setting, name="Scene")
+        self.g_pitput_scene = GPitput(setting=g_pitput_scene_setting,
+                                      name="Scene",
+                                      max_history_length=1)
 
         action_response_settings = {
             "dialogue_opening": "The following is a conversation with a DnD Dungeon Master (DM). "
@@ -49,7 +51,9 @@ class DungeonMaster:
             "asker": "",
             "responser": "DM: "
         }
-        self.g_pitput_action_response = GPitput(setting=action_response_settings, name="ActionResponse")
+        self.g_pitput_action_response = GPitput(setting=action_response_settings,
+                                                name="ActionResponse",
+                                                max_history_length=1)
 
     def describe_opening_scene(self):
         opening_scene = self.g_pitput_scene.chat("describe opening scene")
