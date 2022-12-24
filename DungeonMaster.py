@@ -57,7 +57,7 @@ class DungeonMaster:
         return opening_scene
 
     def react_to_action_request(self, action, character_sheet):
-        action_request = f"Character sheet: {character_sheet.action_request_string}\n" \
+        action_request = f"Character sheet: {character_sheet.action_request_string()}\n" \
                          f"Context: {self.last_scene}\n" \
                          f"Player: {action}"
         return self.g_pitput_action_response.chat(action_request)
