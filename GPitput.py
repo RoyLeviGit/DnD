@@ -5,7 +5,7 @@ from Logger import Logger
 
 
 class GPitput:
-    def __init__(self, setting=None):
+    def __init__(self, setting=None, name=""):
         openai.api_key = os.getenv("OPENAI_API_KEY")
         self.__setting = setting if setting is not None else {
             "dialogue_opening": "The following is a conversation with a DnD Dungeon Master (DM). "
@@ -18,7 +18,7 @@ class GPitput:
             "ask": [],
             "response": []
         }
-        self.__logger = Logger(__class__.__name__)
+        self.__logger = Logger(f"{__class__.__name__}{name}")
 
     def chat(self, ask, max_tokens=128, temperature=0.5):
         prompt = self.__generate_prompt(ask)
