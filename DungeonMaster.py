@@ -19,7 +19,7 @@ class DungeonMaster:
             "dialogue_opening": "The following is a conversation with a DnD Dungeon Master (DM). "
                                 "The DM is creative, clever, and never decides the actions for the players.\n"
                                 "All the DM does is given context, a player action, and character sheet "
-                                "he answers with the minimal relevant character sheet entries "
+                                "he answers with the minimal(!) relevant character sheet entries "
                                 "in this format and nothing else!:\n"
                                 "DM: <list_entry1>: <list_entry1_group>\n"
                                 "...\n"
@@ -41,8 +41,10 @@ class DungeonMaster:
                                 "The pedestal is made of a dark stone and is cold to the touch. As you get closer, "
                                 "you can hear a faint humming sound coming from within the pedestal\n"
                                 "Player: jump to space and back\n"
-                                "DM: Can't do action: You can't do that because it would require skill you don't have, "
-                                "like jumping to space\n"
+                                "DM: Can't do action: You don't have any abilities, skills, feats, proficiencies, "
+                                "equipment, or spells that would allow you to jump to space and back. "
+                                "There is no context in the provided character sheet or the given situation "
+                                "that would allow for such an action.\n"
                                 "Player: do nothing\n"
                                 "DM: \n"
                                 "Player: break pedestal\n"
@@ -56,7 +58,7 @@ class DungeonMaster:
                                                 max_history_length=1)
 
     def describe_opening_scene(self):
-        opening_scene = self.g_pitput_scene.chat("describe opening scene")
+        opening_scene = self.g_pitput_scene.chat("describe opening scene", temperature=1)
         self.last_scene = opening_scene
         return opening_scene
 
@@ -64,7 +66,9 @@ class DungeonMaster:
         action_request = f"Character sheet: {character_sheet.action_request_string()}\n" \
                          f"Context: {self.last_scene}\n" \
                          f"Player: {action}"
-        return self.g_pitput_action_response.chat(action_request)
+        return self.g_pitput_action_response.chat(action_request,
+                                                  temperature=0,
+                                                  stop_seq=["Character sheet:", "Context:", "Player:"])
 
     def describe_scene(self, action):
         scene = self.g_pitput_scene.chat(f"{action}. describe scene")
@@ -78,14 +82,14 @@ class DungeonMaster:
 
     def generate_npc(self):
         npc_name = self.g_pitput_scene.chat("generate name for NPC", max_tokens=8)
-        npc_appearance = self.g_pitput_scene.chat("describe NPC appearance", max_tokens=64)
-        npc_personality = self.g_pitput_scene.chat("describe NPC personality", max_tokens=64)
+        npc_appearance = self.g_pitput_scene.chat("describe NPC appearance", max_tokens=30)
+        npc_personality = self.g_pitput_scene.chat("describe NPC personality", max_tokens=30)
         npc_info = self.g_pitput_scene.chat("provide important information or quest objectives for NPC")
         return {"name": npc_name, "appearance": npc_appearance, "personality": npc_personality, "info": npc_info}
 
     def generate_encounter(self):
         enemy_type = self.g_pitput_scene.chat("generate enemy type", max_tokens=8)
-        enemy_stats = self.g_pitput_scene.chat("generate enemy stats", max_tokens=128)
+        enemy_stats = self.g_pitput_scene.chat("generate statblock")
         return enemy_type, enemy_stats
 
     def generate_loot(self):

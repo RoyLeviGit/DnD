@@ -118,12 +118,12 @@ class CharacterGenerator:
 
     def generate_proficiencies(self):
         # Randomly select a number of proficiencies from the list of available proficiencies
-        num_proficiencies = random.randint(1, len(self.proficiencies))
+        num_proficiencies = self.Dice.roll_d4()
         return random.sample(self.proficiencies, num_proficiencies)
 
     def generate_equipment(self):
         # Randomly select a number of items from the list of available equipment
-        num_items = random.randint(1, len(self.equipment))
+        num_items = self.Dice.roll_d4()
         return random.sample(self.equipment, num_items)
 
     def generate_spellcasting(self):
@@ -150,6 +150,6 @@ class CharacterGenerator:
 
     def generate_notes(self):
         # Generate a random note
-        return "This character has a scar on their left cheek."
+        return "I used to be an adventurer like you, then I took an arrow in the knee."
 
 

@@ -14,10 +14,9 @@ class UI:
     # Print the given output to the console
     trimmed_output = output.strip()
     wrapped_text = textwrap.fill(
-      trimmed_output,
+      "DM: " + trimmed_output,
       width=50,
       tabsize=1,
-      initial_indent='\t',
       subsequent_indent='\t'
     )
     print(wrapped_text)

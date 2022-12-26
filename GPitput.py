@@ -21,14 +21,15 @@ class GPitput:
         self.__max_history_length = max_history_length
         self.__logger = Logger(f"{__class__.__name__}{name}")
 
-    def chat(self, ask, max_tokens=128, temperature=0.5):
+    def chat(self, ask, max_tokens=100, temperature=0.8, stop_seq=None):
         prompt = self.__generate_prompt(ask)
+        stop_seq = self.__generate_stop_sequence(stop_seq)
         completions = openai.Completion.create(
             engine="text-davinci-003",
             prompt=prompt,
             max_tokens=max_tokens,
-            temperature=temperature
-            # TODO stop=self.__setting["asker"]
+            temperature=temperature,
+            stop=stop_seq
         )
         response = completions.choices[0].text
 
@@ -50,6 +51,17 @@ class GPitput:
 
         prompt += self.__setting["asker"] + ask + "\n" + self.__setting["responser"]
         return prompt
+
+    def __generate_stop_sequence(self, stop_seq):
+        if stop_seq is None:
+            stop_seq = []
+        if len(self.__setting["asker"]) > 0:
+            stop_seq += [self.__setting["asker"]]
+
+        if len(self.__setting["responser"]) > 0:
+            stop_seq += [self.__setting["responser"]]
+
+        return stop_seq
 
     def __append_to_history(self, ask, response):
         self.__history["ask"].append(ask)
